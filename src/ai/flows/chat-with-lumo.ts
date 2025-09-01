@@ -94,7 +94,7 @@ const chatWithLumoFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Spica'},
+            prebuiltVoiceConfig: {voiceName: 'Sirius'},
           },
         },
       },
