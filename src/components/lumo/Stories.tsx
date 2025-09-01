@@ -48,9 +48,8 @@ export default function Stories() {
   }, []);
 
   useEffect(() => {
-    // This effect runs only on the client, after the initial render.
-    pickRandomStory();
     setIsClient(true);
+    pickRandomStory();
   }, [pickRandomStory]);
 
   const toggleFavorite = (id: number) => {

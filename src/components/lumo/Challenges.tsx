@@ -75,9 +75,8 @@ export default function Challenges({ mood }: ChallengesProps) {
   }, [mood.name]);
 
   useEffect(() => {
-    // This effect runs only on the client, after the initial render.
-    pickRandomChallenge();
     setIsClient(true);
+    pickRandomChallenge();
   }, [pickRandomChallenge]);
 
 
