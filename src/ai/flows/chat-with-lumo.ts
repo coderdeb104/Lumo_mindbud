@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview An empathetic AI chatbot flow named Lumo that provides support and coping suggestions based on the user's selected mood.
+ * @fileOverview An empathetic AI chatbot flow named Lumo that provides support and coping suggestions based on the user\'s selected mood.
  *
  * - chatWithLumo - A function that handles the chat with Lumo process.
  * - ChatWithLumoInput - The input type for the chatWithLumo function.
