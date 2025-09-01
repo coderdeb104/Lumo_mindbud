@@ -63,44 +63,35 @@ async function toWav(
   });
 }
 
-const prompt = ai.definePrompt({
-  name: 'chatWithLumoPrompt',
-  input: {schema: z.object({mood: z.string(), message: z.string()})},
-  output: {schema: z.object({response: z.string()})},
-  prompt: `You are Lumo, an empathetic AI chatbot. Your tone should be friendly and conversational, like a real human friend. Keep your responses short and supportive.
-
-  The user is feeling {{{mood}}} and has sent the following message:
-  {{{message}}}
-
-  Respond with empathy and offer a brief, relevant coping suggestion.
-  `,
-});
-
 const chatWithLumoFlow = ai.defineFlow(
   {
     name: 'chatWithLumoFlow',
     inputSchema: ChatWithLumoInputSchema,
     outputSchema: ChatWithLumoOutputSchema,
   },
-  async input => {
-    const {output: textOutput} = await prompt(input);
-    if (!textOutput) {
-      throw new Error('No text response from Lumo');
-    }
-    const response = textOutput.response;
+  async ({mood, message}) => {
+    const prompt = `You are Lumo, an empathetic AI chatbot. Your tone should be friendly and conversational, like a real human friend. Keep your responses short and supportive.
 
-    const {media} = await ai.generate({
-      model: googleAI.model('gemini-2.5-flash-preview-tts'),
+    The user is feeling ${mood} and has sent the following message:
+    ${message}
+
+    Respond with empathy and offer a brief, relevant coping suggestion.`;
+
+    const {text, media} = await ai.generate({
+      prompt,
       config: {
-        responseModalities: ['AUDIO'],
+        responseModalities: ['TEXT', 'AUDIO'],
         speechConfig: {
           voiceConfig: {
             prebuiltVoiceConfig: {voiceName: 'Leda'},
           },
         },
       },
-      prompt: response,
     });
+
+    if (!text) {
+      throw new Error('No text response from Lumo');
+    }
     if (!media) {
       throw new Error('no media returned');
     }
@@ -112,7 +103,7 @@ const chatWithLumoFlow = ai.defineFlow(
     const audioWav = await toWav(audioBuffer);
 
     return {
-      response,
+      response: text,
       audio: 'data:audio/wav;base64,' + audioWav,
     };
   }
