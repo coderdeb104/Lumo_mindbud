@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, RefreshCw } from "lucide-react";
 import { Button } from "../ui/button";
 import type { Mood } from './MoodSelector';
+import { Skeleton } from '../ui/skeleton';
 
 type Challenge = {
   title: string;
@@ -44,6 +45,21 @@ type ChallengesProps = {
   mood: Mood;
 };
 
+const ChallengeSkeleton = () => (
+  <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
+    <Card className="bg-card w-full max-w-md">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <Skeleton className="h-5 w-3/5" />
+        <Skeleton className="h-5 w-5" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-4 w-4/5" />
+      </CardContent>
+    </Card>
+    <Skeleton className="h-9 w-36" />
+  </div>
+);
+
 export default function Challenges({ mood }: ChallengesProps) {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -56,35 +72,17 @@ export default function Challenges({ mood }: ChallengesProps) {
     } else {
       setChallenge(null);
     }
-  }, [mood]);
+  }, [mood.name]);
 
   useEffect(() => {
-    setIsClient(true);
+    // This effect runs only on the client, after the initial render.
     pickRandomChallenge();
+    setIsClient(true);
   }, [pickRandomChallenge]);
 
-  if (!isClient) {
-    return (
-      <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
-          <Card className="bg-card w-full max-w-md animate-pulse">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <div className="h-5 w-3/5 rounded-md bg-muted-foreground/20"></div>
-                  <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                  <div className="h-4 w-4/5 rounded-md bg-muted-foreground/20"></div>
-              </CardContent>
-          </Card>
-      </div>
-    );
-  }
 
-  if (!challenge) {
-     return (
-        <div className="h-[60vh] flex items-center justify-center">
-            <p>No challenges available for this mood.</p>
-        </div>
-     );
+  if (!isClient || !challenge) {
+    return <ChallengeSkeleton />;
   }
 
   return (

@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '../ui/skeleton';
 
 export const motivationalStories = [
   { id: 1, text: "I was feeling incredibly overwhelmed with work. Taking just five minutes to step outside and focus on my breath made a world of difference. It didn't solve my problems, but it gave me the clarity to tackle them one by one." },
@@ -20,6 +21,22 @@ type Story = {
   text: string;
 };
 
+const StorySkeleton = () => (
+    <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
+        <Card className="bg-card flex flex-col w-full max-w-md">
+            <CardContent className="p-4 flex-1 space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+            </CardContent>
+            <CardFooter className="p-2 pt-0 self-end">
+                <Skeleton className="h-8 w-8" />
+            </CardFooter>
+        </Card>
+        <Skeleton className="h-9 w-32" />
+    </div>
+);
+
 export default function Stories() {
   const [story, setStory] = useState<Story | null>(null);
   const [favorited, setFavorited] = useState<Set<number>>(new Set());
@@ -31,8 +48,9 @@ export default function Stories() {
   }, []);
 
   useEffect(() => {
-    setIsClient(true);
+    // This effect runs only on the client, after the initial render.
     pickRandomStory();
+    setIsClient(true);
   }, [pickRandomStory]);
 
   const toggleFavorite = (id: number) => {
@@ -47,29 +65,8 @@ export default function Stories() {
     });
   };
 
-  if (!isClient) {
-    return (
-        <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
-            <Card className="bg-card flex flex-col w-full max-w-md animate-pulse">
-                <CardContent className="p-4 flex-1 space-y-2">
-                    <div className="h-4 w-full rounded-md bg-muted-foreground/20"></div>
-                    <div className="h-4 w-full rounded-md bg-muted-foreground/20"></div>
-                    <div className="h-4 w-3/4 rounded-md bg-muted-foreground/20"></div>
-                </CardContent>
-                <CardFooter className="p-2 pt-0 self-end">
-                    <div className="h-8 w-8 rounded-md bg-muted-foreground/20"></div>
-                </CardFooter>
-            </Card>
-        </div>
-    );
-  }
-
-  if (!story) {
-    return (
-      <div className="h-[60vh] flex items-center justify-center">
-        <p>Loading story...</p>
-      </div>
-    );
+  if (!isClient || !story) {
+    return <StorySkeleton />;
   }
 
   return (
