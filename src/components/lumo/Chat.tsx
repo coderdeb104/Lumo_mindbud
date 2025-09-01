@@ -81,7 +81,7 @@ export default function Chat({ mood }: ChatProps) {
             <div
               key={index}
               className={cn(
-                'flex items-start gap-3',
+                'flex items-end gap-2',
                 message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
               )}
             >
@@ -92,25 +92,25 @@ export default function Chat({ mood }: ChatProps) {
               )}
               <div
                 className={cn(
-                  'max-w-[80%] rounded-lg p-3 text-sm flex items-center gap-2',
+                  'max-w-[80%] rounded-lg p-3 text-sm',
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted'
                 )}
               >
                 <span>{message.content}</span>
-                {message.role === 'lumo' && message.audio && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 shrink-0"
-                    onClick={() => playAudio(message.audio as string)}
-                  >
-                    <Mic className="h-4 w-4" />
-                    <span className="sr-only">Play audio</span>
-                  </Button>
-                )}
               </div>
+              {message.role === 'lumo' && message.audio && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => playAudio(message.audio as string)}
+                >
+                  <Mic className="h-4 w-4" />
+                  <span className="sr-only">Play audio</span>
+                </Button>
+              )}
             </div>
           ))}
           {isLoading && (
