@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, RefreshCw } from 'lucide-react';
@@ -18,14 +18,14 @@ export default function Stories() {
   const [story, setStory] = useState<{ id: number; text: string } | null>(null);
   const [favorited, setFavorited] = useState<Set<number>>(new Set());
 
-  const pickRandomStory = () => {
+  const pickRandomStory = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * motivationalStories.length);
     setStory(motivationalStories[randomIndex]);
-  };
+  }, []);
   
   useEffect(() => {
     pickRandomStory();
-  }, []);
+  }, [pickRandomStory]);
 
 
   const toggleFavorite = (id: number) => {

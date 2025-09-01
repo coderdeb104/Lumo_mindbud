@@ -4,7 +4,6 @@ import type { Mood } from "./MoodSelector";
 import Chat from "./Chat";
 import Challenges from "./Challenges";
 import Stories from "./Stories";
-import { useState } from "react";
 
 type DashboardProps = {
   mood: Mood;
@@ -28,7 +27,6 @@ const getGreeting = (moodName: string) => {
 };
 
 export default function Dashboard({ mood }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState("chat");
   return (
     <div className="w-full">
       <div className="flex flex-col items-center text-center">
@@ -39,7 +37,7 @@ export default function Dashboard({ mood }: DashboardProps) {
         <p className="text-muted-foreground">{getGreeting(mood.name)}</p>
       </div>
 
-      <Tabs defaultValue="chat" className="mt-6 w-full" onValueChange={setActiveTab}>
+      <Tabs defaultValue="chat" className="mt-6 w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="chat">Chat with Lumo</TabsTrigger>
           <TabsTrigger value="challenges">Challenges</TabsTrigger>
@@ -48,11 +46,11 @@ export default function Dashboard({ mood }: DashboardProps) {
         <TabsContent value="chat" className="mt-4">
           <Chat mood={mood} />
         </TabsContent>
-        <TabsContent value="challenges" className="mt-4">
-         {activeTab === 'challenges' && <Challenges mood={mood} />}
+        <TabsContent value="challenges" className="mt-4" forceMount>
+         <Challenges mood={mood} />
         </TabsContent>
-        <TabsContent value="stories" className="mt-4">
-          {activeTab === 'stories' && <Stories />}
+        <TabsContent value="stories" className="mt-4" forceMount>
+          <Stories />
         </TabsContent>
       </Tabs>
     </div>

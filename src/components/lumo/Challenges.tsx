@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 import type { Mood } from "./MoodSelector";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "../ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -48,14 +48,14 @@ export default function Challenges({ mood }: ChallengesProps) {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const moodChallenges = challenges[mood.name.toLowerCase()] || [];
 
-  const pickRandomChallenge = () => {
+  const pickRandomChallenge = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * moodChallenges.length);
     setChallenge(moodChallenges[randomIndex]);
-  };
+  }, [moodChallenges]);
 
   useEffect(() => {
     pickRandomChallenge();
-  }, [mood]);
+  }, [pickRandomChallenge, mood]);
 
   if (!challenge) {
     return (
