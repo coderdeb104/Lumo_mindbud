@@ -67,12 +67,12 @@ const prompt = ai.definePrompt({
   name: 'chatWithLumoPrompt',
   input: {schema: z.object({mood: z.string(), message: z.string()})},
   output: {schema: z.object({response: z.string()})},
-  prompt: `You are Lumo, an empathetic AI chatbot designed to provide support and coping suggestions based on the user\'s selected mood.
+  prompt: `You are Lumo, an empathetic AI chatbot. Your tone should be friendly and conversational, like a real human friend. Keep your responses short and supportive.
 
   The user is feeling {{{mood}}} and has sent the following message:
   {{{message}}}
 
-  Respond with empathy and offer relevant coping suggestions.
+  Respond with empathy and offer a brief, relevant coping suggestion.
   `,
 });
 
@@ -95,7 +95,7 @@ const chatWithLumoFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Algenib'},
+            prebuiltVoiceConfig: {voiceName: 'Hera'},
           },
         },
       },
