@@ -22,11 +22,11 @@ export default function Stories() {
     const randomIndex = Math.floor(Math.random() * motivationalStories.length);
     setStory(motivationalStories[randomIndex]);
   }, []);
-  
+
   useEffect(() => {
+    // Only run on the client
     pickRandomStory();
   }, [pickRandomStory]);
-
 
   const toggleFavorite = (id: number) => {
     setFavorited(prev => {
@@ -55,15 +55,15 @@ export default function Stories() {
             <p className="text-sm text-foreground italic">"{story.text}"</p>
         </CardContent>
         <CardFooter className="p-2 pt-0 self-end">
-            <Button 
-            variant="ghost" 
+            <Button
+            variant="ghost"
             size="icon"
             aria-label={favorited.has(story.id) ? 'Unfavorite story' : 'Favorite story'}
             onClick={() => toggleFavorite(story.id)}
             className="group"
             >
-            <Heart className={cn('h-5 w-5 text-muted-foreground transition-all duration-300 group-hover:text-destructive', 
-                favorited.has(story.id) && 'fill-destructive text-destructive')} 
+            <Heart className={cn('h-5 w-5 text-muted-foreground transition-all duration-300 group-hover:text-destructive',
+                favorited.has(story.id) && 'fill-destructive text-destructive')}
             />
             </Button>
         </CardFooter>
