@@ -26,6 +26,7 @@ const ChatWithLumoOutputSchema = z.object({
   response: z.string().describe("Lumo's response to the user message."),
   audio: z
     .string()
+    .optional()
     .describe('A data URI of the audio response from Lumo.'),
 });
 export type ChatWithLumoOutput = z.infer<typeof ChatWithLumoOutputSchema>;
@@ -34,33 +35,6 @@ export async function chatWithLumo(
   input: ChatWithLumoInput
 ): Promise<ChatWithLumoOutput> {
   return chatWithLumoFlow(input);
-}
-
-async function toWav(
-  pcmData: Buffer,
-  channels = 1,
-  rate = 24000,
-  sampleWidth = 2
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const writer = new wav.Writer({
-      channels,
-      sampleRate: rate,
-      bitDepth: sampleWidth * 8,
-    });
-
-    let bufs = [] as any[];
-    writer.on('error', reject);
-    writer.on('data', function (d) {
-      bufs.push(d);
-    });
-    writer.on('end', function () {
-      resolve(Buffer.concat(bufs).toString('base64'));
-    });
-
-    writer.write(pcmData);
-    writer.end();
-  });
 }
 
 const chatWithLumoFlow = ai.defineFlow(
@@ -78,6 +52,7 @@ const chatWithLumoFlow = ai.defineFlow(
     Respond with empathy and offer a brief, relevant coping suggestion.`;
 
     const {text} = await ai.generate({
+      model: 'googleai/gemini-2.5-flash',
       prompt,
     });
 
@@ -85,32 +60,8 @@ const chatWithLumoFlow = ai.defineFlow(
       throw new Error('No text response from Lumo');
     }
 
-    const {media} = await ai.generate({
-      model: googleAI.model('gemini-2.5-flash-preview-tts'),
-      prompt: text,
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Leda'},
-          },
-        },
-      },
-    });
-
-    if (!media) {
-      throw new Error('no media returned');
-    }
-
-    const audioBuffer = Buffer.from(
-      media.url.substring(media.url.indexOf(',') + 1),
-      'base64'
-    );
-    const audioWav = await toWav(audioBuffer);
-
     return {
       response: text,
-      audio: 'data:audio/wav;base64,' + audioWav,
     };
   }
 );
