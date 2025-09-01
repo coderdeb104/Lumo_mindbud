@@ -7,7 +7,7 @@ import type { Mood } from "./MoodSelector";
 import Chat from "./Chat";
 import Challenges, { challenges } from "./Challenges";
 import Stories, { motivationalStories } from "./Stories";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 type DashboardProps = {
   mood: Mood;
@@ -32,19 +32,31 @@ const getGreeting = (moodName: string) => {
 
 export default function Dashboard({ mood }: DashboardProps) {
   const [activeTab, setActiveTab] = useState('chat');
-  const [story, setStory] = useState(motivationalStories[Math.floor(Math.random() * motivationalStories.length)]);
-  const moodChallenges = challenges[mood.name.toLowerCase()] || [];
-  const [challenge, setChallenge] = useState(moodChallenges[Math.floor(Math.random() * moodChallenges.length)]);
+  
+  // Story state
+  const [story, setStory] = useState<{ id: number; text: string } | null>(null);
 
   const pickRandomStory = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * motivationalStories.length);
     setStory(motivationalStories[randomIndex]);
   }, []);
 
+  // Challenge state
+  const moodChallenges = challenges[mood.name.toLowerCase()] || [];
+  const [challenge, setChallenge] = useState<(typeof moodChallenges[0]) | null>(null);
+  
   const pickRandomChallenge = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * moodChallenges.length);
-    setChallenge(moodChallenges[randomIndex]);
+    if (moodChallenges.length > 0) {
+      const randomIndex = Math.floor(Math.random() * moodChallenges.length);
+      setChallenge(moodChallenges[randomIndex]);
+    }
   }, [moodChallenges]);
+
+  // Set initial story and challenge on client mount
+  useEffect(() => {
+    pickRandomStory();
+    pickRandomChallenge();
+  }, [pickRandomStory, pickRandomChallenge]);
 
 
   const handleTabChange = (value: string) => {
@@ -76,10 +88,10 @@ export default function Dashboard({ mood }: DashboardProps) {
         <TabsContent value="chat" className="mt-4">
           <Chat mood={mood} />
         </TabsContent>
-        <TabsContent value="challenges" className="mt-4" forceMount>
+        <TabsContent value="challenges" className="mt-4">
          <Challenges challenge={challenge} onNewChallenge={pickRandomChallenge} />
         </TabsContent>
-        <TabsContent value="stories" className="mt-4" forceMount>
+        <TabsContent value="stories" className="mt-4">
           <Stories story={story} onNewStory={pickRandomStory} />
         </TabsContent>
       </Tabs>

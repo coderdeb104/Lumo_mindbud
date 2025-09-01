@@ -46,12 +46,7 @@ type ChallengesProps = {
 };
 
 export default function Challenges({ challenge, onNewChallenge }: ChallengesProps) {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient || !challenge) {
+  if (!challenge) {
     return (
       <div className="h-[60vh] flex items-center justify-center">
         <p>Loading challenge...</p>

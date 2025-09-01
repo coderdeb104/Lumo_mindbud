@@ -21,12 +21,7 @@ type StoriesProps = {
 };
 
 export default function Stories({ story, onNewStory }: StoriesProps) {
-  const [isClient, setIsClient] = useState(false);
   const [favorited, setFavorited] = useState<Set<number>>(new Set());
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const toggleFavorite = (id: number) => {
     setFavorited(prev => {
@@ -40,7 +35,7 @@ export default function Stories({ story, onNewStory }: StoriesProps) {
     });
   };
 
-  if (!isClient || !story) {
+  if (!story) {
     return (
         <div className="h-[60vh] flex items-center justify-center">
             <p>Loading story...</p>
