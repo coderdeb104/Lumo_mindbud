@@ -1,10 +1,11 @@
 
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { Button } from "../ui/button";
-import { RefreshCw } from "lucide-react";
+import type { Mood } from './MoodSelector';
 
 type Challenge = {
   title: string;
@@ -40,12 +41,29 @@ export const challenges: Record<string, Challenge[]> = {
 };
 
 type ChallengesProps = {
-  challenge: Challenge | null;
-  onNewChallenge: () => void;
+  mood: Mood;
 };
 
-export default function Challenges({ challenge, onNewChallenge }: ChallengesProps) {
-  if (!challenge) {
+export default function Challenges({ mood }: ChallengesProps) {
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  const pickRandomChallenge = useCallback(() => {
+    const moodChallenges = challenges[mood.name.toLowerCase()] || [];
+    if (moodChallenges.length > 0) {
+      const randomIndex = Math.floor(Math.random() * moodChallenges.length);
+      setChallenge(moodChallenges[randomIndex]);
+    } else {
+      setChallenge(null);
+    }
+  }, [mood]);
+
+  useEffect(() => {
+    setIsClient(true);
+    pickRandomChallenge();
+  }, [pickRandomChallenge]);
+
+  if (!isClient || !challenge) {
     return (
       <div className="h-[60vh] flex items-center justify-center">
         <p>Loading challenge...</p>
@@ -64,7 +82,7 @@ export default function Challenges({ challenge, onNewChallenge }: ChallengesProp
             <p className="text-sm text-muted-foreground">{challenge.description}</p>
             </CardContent>
         </Card>
-        <Button onClick={onNewChallenge} variant="outline" size="sm">
+        <Button onClick={pickRandomChallenge} variant="outline" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             New Challenge
         </Button>

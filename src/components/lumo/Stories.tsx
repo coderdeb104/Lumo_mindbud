@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, RefreshCw } from 'lucide-react';
@@ -15,13 +15,25 @@ export const motivationalStories = [
   { id: 5, text: "I started a 'smile file' on my phone - a collection of funny memes, cute animal pictures, and happy memories. Whenever I'm feeling low, I scroll through it. It's a quick and easy way to get a little mood boost." },
 ];
 
-type StoriesProps = {
-    story: { id: number; text: string } | null;
-    onNewStory: () => void;
+type Story = {
+  id: number;
+  text: string;
 };
 
-export default function Stories({ story, onNewStory }: StoriesProps) {
+export default function Stories() {
+  const [story, setStory] = useState<Story | null>(null);
   const [favorited, setFavorited] = useState<Set<number>>(new Set());
+  const [isClient, setIsClient] = useState(false);
+
+  const pickRandomStory = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * motivationalStories.length);
+    setStory(motivationalStories[randomIndex]);
+  }, []);
+
+  useEffect(() => {
+    setIsClient(true);
+    pickRandomStory();
+  }, [pickRandomStory]);
 
   const toggleFavorite = (id: number) => {
     setFavorited(prev => {
@@ -35,38 +47,38 @@ export default function Stories({ story, onNewStory }: StoriesProps) {
     });
   };
 
-  if (!story) {
+  if (!isClient || !story) {
     return (
-        <div className="h-[60vh] flex items-center justify-center">
-            <p>Loading story...</p>
-        </div>
+      <div className="h-[60vh] flex items-center justify-center">
+        <p>Loading story...</p>
+      </div>
     );
   }
 
   return (
     <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
-        <Card key={story.id} className="bg-card flex flex-col w-full max-w-md">
+      <Card key={story.id} className="bg-card flex flex-col w-full max-w-md">
         <CardContent className="p-4 flex-1">
-            <p className="text-sm text-foreground italic">"{story.text}"</p>
+          <p className="text-sm text-foreground italic">"{story.text}"</p>
         </CardContent>
         <CardFooter className="p-2 pt-0 self-end">
-            <Button
+          <Button
             variant="ghost"
             size="icon"
             aria-label={favorited.has(story.id) ? 'Unfavorite story' : 'Favorite story'}
             onClick={() => toggleFavorite(story.id)}
             className="group"
-            >
+          >
             <Heart className={cn('h-5 w-5 text-muted-foreground transition-all duration-300 group-hover:text-destructive',
                 favorited.has(story.id) && 'fill-destructive text-destructive')}
             />
-            </Button>
+          </Button>
         </CardFooter>
-        </Card>
-        <Button onClick={onNewStory} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            New Story
-        </Button>
+      </Card>
+      <Button onClick={pickRandomStory} variant="outline" size="sm">
+        <RefreshCw className="h-4 w-4 mr-2" />
+        New Story
+      </Button>
     </div>
   );
 }
