@@ -13,6 +13,16 @@ type DashboardProps = {
   mood: Mood;
 };
 
+type Challenge = {
+  title: string;
+  description: string;
+};
+
+type Story = {
+  id: number;
+  text: string;
+};
+
 const getGreeting = (moodName: string) => {
   switch (moodName.toLowerCase()) {
     case 'happy':
@@ -32,10 +42,10 @@ const getGreeting = (moodName: string) => {
 
 export default function Dashboard({ mood }: DashboardProps) {
   const [activeTab, setActiveTab] = useState('chat');
-  
-  // Story state
-  const [story, setStory] = useState<{ id: number; text: string } | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
+  // Story state
+  const [story, setStory] = useState<Story | null>(null);
   const pickRandomStory = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * motivationalStories.length);
     setStory(motivationalStories[randomIndex]);
@@ -43,8 +53,7 @@ export default function Dashboard({ mood }: DashboardProps) {
 
   // Challenge state
   const moodChallenges = challenges[mood.name.toLowerCase()] || [];
-  const [challenge, setChallenge] = useState<(typeof moodChallenges[0]) | null>(null);
-  
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
   const pickRandomChallenge = useCallback(() => {
     if (moodChallenges.length > 0) {
       const randomIndex = Math.floor(Math.random() * moodChallenges.length);
@@ -52,12 +61,12 @@ export default function Dashboard({ mood }: DashboardProps) {
     }
   }, [moodChallenges]);
 
-  // Set initial story and challenge on client mount
+  // Set initial story and challenge on client mount to avoid hydration mismatch
   useEffect(() => {
+    setIsClient(true);
     pickRandomStory();
     pickRandomChallenge();
   }, [pickRandomStory, pickRandomChallenge]);
-
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -68,6 +77,9 @@ export default function Dashboard({ mood }: DashboardProps) {
       pickRandomChallenge();
     }
   }
+
+  const challengeContent = isClient ? <Challenges challenge={challenge} onNewChallenge={pickRandomChallenge} /> : <Challenges challenge={null} onNewChallenge={() => {}} />;
+  const storiesContent = isClient ? <Stories story={story} onNewStory={pickRandomStory} /> : <Stories story={null} onNewStory={() => {}} />;
 
   return (
     <div className="w-full">
@@ -89,10 +101,10 @@ export default function Dashboard({ mood }: DashboardProps) {
           <Chat mood={mood} />
         </TabsContent>
         <TabsContent value="challenges" className="mt-4">
-         <Challenges challenge={challenge} onNewChallenge={pickRandomChallenge} />
+          {challengeContent}
         </TabsContent>
         <TabsContent value="stories" className="mt-4">
-          <Stories story={story} onNewStory={pickRandomStory} />
+          {storiesContent}
         </TabsContent>
       </Tabs>
     </div>

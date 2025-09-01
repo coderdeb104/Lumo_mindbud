@@ -3,7 +3,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
-import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { RefreshCw } from "lucide-react";
 
