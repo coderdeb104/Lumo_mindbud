@@ -1,9 +1,9 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
-import type { Mood } from "./MoodSelector";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -12,7 +12,7 @@ type Challenge = {
   description: string;
 };
 
-const challenges: Record<string, Challenge[]> = {
+export const challenges: Record<string, Challenge[]> = {
   happy: [
     { title: "Share Your Joy", description: "Tell a friend or family member what's making you happy today." },
     { title: "Gratitude List", description: "Write down three things you're grateful for right now." },
@@ -41,23 +41,17 @@ const challenges: Record<string, Challenge[]> = {
 };
 
 type ChallengesProps = {
-  mood: Mood;
+  challenge: Challenge | null;
+  onNewChallenge: () => void;
 };
 
-export default function Challenges({ mood }: ChallengesProps) {
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
-  const moodChallenges = challenges[mood.name.toLowerCase()] || [];
-
-  const pickRandomChallenge = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * moodChallenges.length);
-    setChallenge(moodChallenges[randomIndex]);
-  }, [moodChallenges]);
-
+export default function Challenges({ challenge, onNewChallenge }: ChallengesProps) {
+  const [isClient, setIsClient] = useState(false);
   useEffect(() => {
-    pickRandomChallenge();
-  }, [pickRandomChallenge, mood]);
+    setIsClient(true);
+  }, []);
 
-  if (!challenge) {
+  if (!isClient || !challenge) {
     return (
       <div className="h-[60vh] flex items-center justify-center">
         <p>Loading challenge...</p>
@@ -76,7 +70,7 @@ export default function Challenges({ mood }: ChallengesProps) {
             <p className="text-sm text-muted-foreground">{challenge.description}</p>
             </CardContent>
         </Card>
-        <Button onClick={pickRandomChallenge} variant="outline" size="sm">
+        <Button onClick={onNewChallenge} variant="outline" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             New Challenge
         </Button>

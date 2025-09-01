@@ -1,9 +1,13 @@
+
+'use client';
+
 import LumoMascot from "@/components/lumo/LumoMascot";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Mood } from "./MoodSelector";
 import Chat from "./Chat";
-import Challenges from "./Challenges";
-import Stories from "./Stories";
+import Challenges, { challenges } from "./Challenges";
+import Stories, { motivationalStories } from "./Stories";
+import { useState, useCallback } from "react";
 
 type DashboardProps = {
   mood: Mood;
@@ -27,6 +31,32 @@ const getGreeting = (moodName: string) => {
 };
 
 export default function Dashboard({ mood }: DashboardProps) {
+  const [activeTab, setActiveTab] = useState('chat');
+  const [story, setStory] = useState(motivationalStories[Math.floor(Math.random() * motivationalStories.length)]);
+  const moodChallenges = challenges[mood.name.toLowerCase()] || [];
+  const [challenge, setChallenge] = useState(moodChallenges[Math.floor(Math.random() * moodChallenges.length)]);
+
+  const pickRandomStory = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * motivationalStories.length);
+    setStory(motivationalStories[randomIndex]);
+  }, []);
+
+  const pickRandomChallenge = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * moodChallenges.length);
+    setChallenge(moodChallenges[randomIndex]);
+  }, [moodChallenges]);
+
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === 'stories') {
+      pickRandomStory();
+    }
+    if (value === 'challenges') {
+      pickRandomChallenge();
+    }
+  }
+
   return (
     <div className="w-full">
       <div className="flex flex-col items-center text-center">
@@ -37,7 +67,7 @@ export default function Dashboard({ mood }: DashboardProps) {
         <p className="text-muted-foreground">{getGreeting(mood.name)}</p>
       </div>
 
-      <Tabs defaultValue="chat" className="mt-6 w-full">
+      <Tabs defaultValue="chat" className="mt-6 w-full" onValueChange={handleTabChange} value={activeTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="chat">Chat with Lumo</TabsTrigger>
           <TabsTrigger value="challenges">Challenges</TabsTrigger>
@@ -47,10 +77,10 @@ export default function Dashboard({ mood }: DashboardProps) {
           <Chat mood={mood} />
         </TabsContent>
         <TabsContent value="challenges" className="mt-4" forceMount>
-         <Challenges mood={mood} />
+         <Challenges challenge={challenge} onNewChallenge={pickRandomChallenge} />
         </TabsContent>
         <TabsContent value="stories" className="mt-4" forceMount>
-          <Stories />
+          <Stories story={story} onNewStory={pickRandomStory} />
         </TabsContent>
       </Tabs>
     </div>

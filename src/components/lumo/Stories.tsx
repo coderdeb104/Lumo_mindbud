@@ -1,12 +1,13 @@
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const motivationalStories = [
+export const motivationalStories = [
   { id: 1, text: "I was feeling incredibly overwhelmed with work. Taking just five minutes to step outside and focus on my breath made a world of difference. It didn't solve my problems, but it gave me the clarity to tackle them one by one." },
   { id: 2, text: "After a tough breakup, I felt so alone. I started writing down one good thing that happened each day, no matter how small. Slowly, it helped me see that there was still light in my life, even during the darkness." },
   { id: 3, text: "Anxiety used to rule my days. Learning the 5-4-3-2-1 grounding technique was a game-changer. It pulls me out of my head and back into the present moment. It's a simple tool, but it's been so powerful for me." },
@@ -14,19 +15,18 @@ const motivationalStories = [
   { id: 5, text: "I started a 'smile file' on my phone - a collection of funny memes, cute animal pictures, and happy memories. Whenever I'm feeling low, I scroll through it. It's a quick and easy way to get a little mood boost." },
 ];
 
-export default function Stories() {
-  const [story, setStory] = useState<{ id: number; text: string } | null>(null);
+type StoriesProps = {
+    story: { id: number; text: string } | null;
+    onNewStory: () => void;
+};
+
+export default function Stories({ story, onNewStory }: StoriesProps) {
+  const [isClient, setIsClient] = useState(false);
   const [favorited, setFavorited] = useState<Set<number>>(new Set());
 
-  const pickRandomStory = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * motivationalStories.length);
-    setStory(motivationalStories[randomIndex]);
-  }, []);
-
   useEffect(() => {
-    // Only run on the client
-    pickRandomStory();
-  }, [pickRandomStory]);
+    setIsClient(true);
+  }, []);
 
   const toggleFavorite = (id: number) => {
     setFavorited(prev => {
@@ -40,7 +40,7 @@ export default function Stories() {
     });
   };
 
-  if (!story) {
+  if (!isClient || !story) {
     return (
         <div className="h-[60vh] flex items-center justify-center">
             <p>Loading story...</p>
@@ -68,7 +68,7 @@ export default function Stories() {
             </Button>
         </CardFooter>
         </Card>
-        <Button onClick={pickRandomStory} variant="outline" size="sm">
+        <Button onClick={onNewStory} variant="outline" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             New Story
         </Button>
