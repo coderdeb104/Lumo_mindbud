@@ -8,12 +8,13 @@ import { chatWithLumo } from '@/ai/flows/chat-with-lumo';
 import type { Mood } from './MoodSelector';
 import { cn } from '@/lib/utils';
 import LumoMascot from './LumoMascot';
-import { SendHorizonal } from 'lucide-react';
+import { Mic, SendHorizonal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 type Message = {
   role: 'user' | 'lumo';
   content: string;
+  audio?: string;
 };
 
 type ChatProps = {
@@ -31,6 +32,7 @@ export default function Chat({ mood }: ChatProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -49,7 +51,7 @@ export default function Chat({ mood }: ChatProps) {
 
     try {
       const result = await chatWithLumo({ mood: mood.name, message: input });
-      const lumoMessage: Message = { role: 'lumo', content: result.response };
+      const lumoMessage: Message = { role: 'lumo', content: result.response, audio: result.audio };
       setMessages((prev) => [...prev, lumoMessage]);
     } catch (error) {
       console.error('Error chatting with Lumo:', error);
@@ -58,10 +60,16 @@ export default function Chat({ mood }: ChatProps) {
         title: "Oh no!",
         description: "I'm having a little trouble connecting. Please try again in a moment.",
       });
-      // remove the user message if the call fails
       setMessages((prev) => prev.slice(0, prev.length - 1));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const playAudio = (audioSrc: string) => {
+    if (audioRef.current) {
+      audioRef.current.src = audioSrc;
+      audioRef.current.play().catch(e => console.error("Error playing audio:", e));
     }
   };
 
@@ -84,13 +92,24 @@ export default function Chat({ mood }: ChatProps) {
               )}
               <div
                 className={cn(
-                  'max-w-[80%] rounded-lg p-3 text-sm',
+                  'max-w-[80%] rounded-lg p-3 text-sm flex items-center gap-2',
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted'
                 )}
               >
-                {message.content}
+                <span>{message.content}</span>
+                {message.role === 'lumo' && message.audio && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 shrink-0"
+                    onClick={() => playAudio(message.audio as string)}
+                  >
+                    <Mic className="h-4 w-4" />
+                    <span className="sr-only">Play audio</span>
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -126,6 +145,7 @@ export default function Chat({ mood }: ChatProps) {
           </Button>
         </form>
       </div>
+      <audio ref={audioRef} className="hidden" />
     </div>
   );
 }
