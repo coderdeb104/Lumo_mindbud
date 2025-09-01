@@ -63,12 +63,28 @@ export default function Challenges({ mood }: ChallengesProps) {
     pickRandomChallenge();
   }, [pickRandomChallenge]);
 
-  if (!isClient || !challenge) {
+  if (!isClient) {
     return (
-      <div className="h-[60vh] flex items-center justify-center">
-        <p>Loading challenge...</p>
+      <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
+          <Card className="bg-card w-full max-w-md animate-pulse">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <div className="h-5 w-3/5 rounded-md bg-muted-foreground/20"></div>
+                  <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                  <div className="h-4 w-4/5 rounded-md bg-muted-foreground/20"></div>
+              </CardContent>
+          </Card>
       </div>
     );
+  }
+
+  if (!challenge) {
+     return (
+        <div className="h-[60vh] flex items-center justify-center">
+            <p>No challenges available for this mood.</p>
+        </div>
+     );
   }
 
   return (

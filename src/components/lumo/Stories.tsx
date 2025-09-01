@@ -47,7 +47,24 @@ export default function Stories() {
     });
   };
 
-  if (!isClient || !story) {
+  if (!isClient) {
+    return (
+        <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
+            <Card className="bg-card flex flex-col w-full max-w-md animate-pulse">
+                <CardContent className="p-4 flex-1 space-y-2">
+                    <div className="h-4 w-full rounded-md bg-muted-foreground/20"></div>
+                    <div className="h-4 w-full rounded-md bg-muted-foreground/20"></div>
+                    <div className="h-4 w-3/4 rounded-md bg-muted-foreground/20"></div>
+                </CardContent>
+                <CardFooter className="p-2 pt-0 self-end">
+                    <div className="h-8 w-8 rounded-md bg-muted-foreground/20"></div>
+                </CardFooter>
+            </Card>
+        </div>
+    );
+  }
+
+  if (!story) {
     return (
       <div className="h-[60vh] flex items-center justify-center">
         <p>Loading story...</p>
