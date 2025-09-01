@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -94,7 +95,7 @@ const chatWithLumoFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Sirius'},
+            prebuiltVoiceConfig: {voiceName: 'Umbriel'},
           },
         },
       },
