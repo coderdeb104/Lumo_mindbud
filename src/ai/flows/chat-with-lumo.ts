@@ -77,10 +77,19 @@ const chatWithLumoFlow = ai.defineFlow(
 
     Respond with empathy and offer a brief, relevant coping suggestion.`;
 
-    const {text, media} = await ai.generate({
+    const {text} = await ai.generate({
       prompt,
+    });
+
+    if (!text) {
+      throw new Error('No text response from Lumo');
+    }
+
+    const {media} = await ai.generate({
+      model: googleAI.model('gemini-2.5-flash-preview-tts'),
+      prompt: text,
       config: {
-        responseModalities: ['TEXT', 'AUDIO'],
+        responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
             prebuiltVoiceConfig: {voiceName: 'Leda'},
@@ -89,9 +98,6 @@ const chatWithLumoFlow = ai.defineFlow(
       },
     });
 
-    if (!text) {
-      throw new Error('No text response from Lumo');
-    }
     if (!media) {
       throw new Error('no media returned');
     }
