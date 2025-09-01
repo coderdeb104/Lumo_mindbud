@@ -1,6 +1,11 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 import type { Mood } from "./MoodSelector";
+import { useState, useEffect } from "react";
+import { Button } from "../ui/button";
+import { RefreshCw } from "lucide-react";
 
 type Challenge = {
   title: string;
@@ -40,23 +45,41 @@ type ChallengesProps = {
 };
 
 export default function Challenges({ mood }: ChallengesProps) {
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
   const moodChallenges = challenges[mood.name.toLowerCase()] || [];
 
+  const pickRandomChallenge = () => {
+    const randomIndex = Math.floor(Math.random() * moodChallenges.length);
+    setChallenge(moodChallenges[randomIndex]);
+  };
+
+  useEffect(() => {
+    pickRandomChallenge();
+  }, [mood]);
+
+  if (!challenge) {
+    return (
+      <div className="h-[60vh] flex items-center justify-center">
+        <p>Loading challenge...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-[60vh] overflow-y-auto pr-2">
-      <div className="space-y-4">
-        {moodChallenges.map((challenge, index) => (
-          <Card key={index} className="bg-card">
+    <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
+        <Card className="bg-card w-full max-w-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base font-semibold">{challenge.title}</CardTitle>
-              <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-base font-semibold">{challenge.title}</CardTitle>
+            <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{challenge.description}</p>
+            <p className="text-sm text-muted-foreground">{challenge.description}</p>
             </CardContent>
-          </Card>
-        ))}
-      </div>
+        </Card>
+        <Button onClick={pickRandomChallenge} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            New Challenge
+        </Button>
     </div>
   );
 }

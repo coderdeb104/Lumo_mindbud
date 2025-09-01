@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart } from 'lucide-react';
+import { Heart, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const motivationalStories = [
   { id: 1, text: "I was feeling incredibly overwhelmed with work. Taking just five minutes to step outside and focus on my breath made a world of difference. It didn't solve my problems, but it gave me the clarity to tackle them one by one." },
@@ -16,7 +15,18 @@ const motivationalStories = [
 ];
 
 export default function Stories() {
+  const [story, setStory] = useState<{ id: number; text: string } | null>(null);
   const [favorited, setFavorited] = useState<Set<number>>(new Set());
+
+  const pickRandomStory = () => {
+    const randomIndex = Math.floor(Math.random() * motivationalStories.length);
+    setStory(motivationalStories[randomIndex]);
+  };
+  
+  useEffect(() => {
+    pickRandomStory();
+  }, []);
+
 
   const toggleFavorite = (id: number) => {
     setFavorited(prev => {
@@ -30,30 +40,38 @@ export default function Stories() {
     });
   };
 
+  if (!story) {
+    return (
+        <div className="h-[60vh] flex items-center justify-center">
+            <p>Loading story...</p>
+        </div>
+    );
+  }
+
   return (
-    <ScrollArea className="h-[60vh]">
-      <div className="space-y-4 pr-4">
-        {motivationalStories.map((story) => (
-          <Card key={story.id} className="bg-card flex flex-col">
-            <CardContent className="p-4 flex-1">
-              <p className="text-sm text-foreground italic">"{story.text}"</p>
-            </CardContent>
-            <CardFooter className="p-2 pt-0 self-end">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                aria-label={favorited.has(story.id) ? 'Unfavorite story' : 'Favorite story'}
-                onClick={() => toggleFavorite(story.id)}
-                className="group"
-                >
-                <Heart className={cn('h-5 w-5 text-muted-foreground transition-all duration-300 group-hover:text-destructive', 
-                    favorited.has(story.id) && 'fill-destructive text-destructive')} 
-                />
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    </ScrollArea>
+    <div className="h-[60vh] flex flex-col justify-center items-center space-y-4">
+        <Card key={story.id} className="bg-card flex flex-col w-full max-w-md">
+        <CardContent className="p-4 flex-1">
+            <p className="text-sm text-foreground italic">"{story.text}"</p>
+        </CardContent>
+        <CardFooter className="p-2 pt-0 self-end">
+            <Button 
+            variant="ghost" 
+            size="icon"
+            aria-label={favorited.has(story.id) ? 'Unfavorite story' : 'Favorite story'}
+            onClick={() => toggleFavorite(story.id)}
+            className="group"
+            >
+            <Heart className={cn('h-5 w-5 text-muted-foreground transition-all duration-300 group-hover:text-destructive', 
+                favorited.has(story.id) && 'fill-destructive text-destructive')} 
+            />
+            </Button>
+        </CardFooter>
+        </Card>
+        <Button onClick={pickRandomStory} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            New Story
+        </Button>
+    </div>
   );
 }
