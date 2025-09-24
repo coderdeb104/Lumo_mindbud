@@ -75,3 +75,11 @@ cd Lumo_mindbud
 npm install
 # or
 yarn
+
+npm run dev
+# or
+yarn dev
+
+npm run build
+# or
+yarn build
