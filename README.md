@@ -84,13 +84,13 @@ npm run dev
 yarn dev
 
 
-##To create a production build:
+### To create a production build:
 
 npm run build
 # or
 yarn build
 
-##Here’s a simplified view of the file/folder layout:
+#### Here’s a simplified view of the file/folder layout:
 
 ├── docs/
 ├── src/
