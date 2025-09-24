@@ -76,10 +76,33 @@ npm install
 # or
 yarn
 
+## Running Locally
+
+```bash
 npm run dev
 # or
 yarn dev
 
+
+##To create a production build:
+
 npm run build
 # or
 yarn build
+
+##Here’s a simplified view of the file/folder layout:
+
+├── docs/
+├── src/
+│   ├── app/
+│   ├── components/
+│   └── ... (pages, styles, etc.)
+├── .gitignore
+├── apphosting.yaml
+├── components.json
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── tailwind.config.ts
+├── tsconfig.json
+└── README.md
